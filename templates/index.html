@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prédiction des Feux de Forêt</title>
+    <!-- Chargement de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10">
+
+    <div class="w-full max-w-2xl bg-gray-800 p-8 md:p-10 rounded-xl shadow-2xl border border-red-700/50">
+        <h1 class="text-3xl font-bold text-center mb-6 text-red-400">
+            🔥 Prédiction de la Gravité des Feux (Algérie)
+        </h1>
+        <p class="text-sm text-gray-400 text-center mb-8">
+            Entrez les conditions météorologiques et les indices de combustibles pour estimer l'indice de gravité (ex: FWI).
+        </p>
+
+        <form action="{{ url_for('predict_data') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Bloc 1: Météo -->
+            <div class="md:col-span-2">
+                <h2 class="text-lg font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Conditions Météorologiques</h2>
+            </div>
+            
+            <!-- Température -->
+            <div class="col-span-1">
+                <label for="Temperature" class="block text-sm font-medium text-gray-300">Température (°C)</label>
+                <input type="number" step="any" id="Temperature" name="Temperature" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+            </div>
+
+            <!-- Humidité Relative (RH) -->
+            <div class="col-span-1">
+                <label for="RH" class="block text-sm font-medium text-gray-300">Humidité Relative (%)</label>
+                <input type="number" step="any" id="RH" name="RH" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+            </div>
+
+            <!-- Vitesse du Vent (Ws) -->
+            <div class="col-span-1">
+                <label for="Ws" class="block text-sm font-medium text-gray-300">Vitesse du Vent (km/h)</label>
+                <input type="number" step="any" id="Ws" name="Ws" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+            </div>
+
+            <!-- Pluie (Rain) -->
+            <div class="col-span-1">
+                <label for="Rain" class="block text-sm font-medium text-gray-300">Pluie (mm)</label>
+                <input type="number" step="any" id="Rain" name="Rain" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+            </div>
+            
+            <!-- Bloc 2: Indices de Combustible (FWI System) -->
+            <div class="md:col-span-2 mt-4">
+                <h2 class="text-lg font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Indices Canadiens FWI</h2>
+            </div>
+
+            <div class="col-span-1">
+                <label for="FFMC" class="block text-sm font-medium text-gray-300">FFMC (Fine Fuel Moisture Code)</label>
+                <input type="number" step="any" id="FFMC" name="FFMC" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+            </div>
+            
+            <div class="col-span-1">
+                <label for="DMC" class="block text-sm font-medium text-gray-300">DMC (Duff Moisture Code)</label>
+                <input type="number" step="any" id="DMC" name="DMC" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+            </div>
+            
+            <div class="col-span-1">
+                <label for="DC" class="block text-sm font-medium text-gray-300">DC (Drought Code)</label>
+                <input type="number" step="any" id="DC" name="DC" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+            </div>
+            
+            <div class="col-span-1">
+                <label for="ISI" class="block text-sm font-medium text-gray-300">ISI (Initial Spread Index)</label>
+                <input type="number" step="any" id="ISI" name="ISI" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+            </div>
+
+            <!-- NOUVEAU CHAMP BUI (name="BUI") -->
+            <div class="col-span-1">
+                <label for="BUI" class="block text-sm font-medium text-gray-300">BUI (Build-up Index)</label>
+                <input type="number" step="any" id="BUI" name="BUI" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+            </div>
+
+            <!-- Place-holder pour alignement, si nécessaire -->
+            <div class="col-span-1"></div>
+
+
+            <!-- Bloc 3: Catégoriels/Binaires -->
+            <div class="md:col-span-2 mt-4">
+                <h2 class="text-lg font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Informations Contextuelles</h2>
+            </div>
+
+            <!-- Classes de feu (supposé 0 ou 1) -->
+            <div class="col-span-1">
+                <label for="Classes" class="block text-sm font-medium text-gray-300">Classe de Feu (0: Non-feu, 1: Feu)</label>
+                <select id="Classes" name="Classes" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+                    <option value="0">0 (Non-feu)</option>
+                    <option value="1">1 (Feu)</option>
+                </select>
+            </div>
+
+            <!-- Région (supposé 0 ou 1) -->
+            <div class="col-span-1">
+                <label for="Region" class="block text-sm font-medium text-gray-300">Région (0: Bejaia, 1: Sidi Bel-Abbes)</label>
+                <select id="Region" name="Region" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-red-500 focus:border-red-500 transition duration-150">
+                    <option value="0">0 (Bejaia)</option>
+                    <option value="1">1 (Sidi Bel-Abbes)</option>
+                </select>
+            </div>
+
+            <!-- Bouton de Soumission -->
+            <div class="md:col-span-2 pt-6">
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-200 transform hover:scale-[1.01]">
+                    Prédire la Gravité
+                </button>
+            </div>
+        </form>
+
+        <!-- Affichage du Résultat de la Prédiction -->
+        {% if prediction_text %}
+        <div id="prediction-result" class="mt-8 p-4 bg-red-800/30 border-l-4 border-red-500 rounded-r-lg shadow-inner">
+            <h3 class="text-xl font-semibold text-red-300 mb-2">Résultat :</h3>
+            <p class="text-white text-lg font-mono">{{ prediction_text }}</p>
+        </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>
