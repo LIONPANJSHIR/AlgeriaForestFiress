@@ -98,4 +98,4 @@ Ce projet nécessite les bibliothèques Python suivantes :
   * `numpy`
   * `pandas`
   * `scikit-learn`
-  * `pickle` (intégré à Python)
+  * `pickle` (intégré à Python)# AlgeriaForestFiress
